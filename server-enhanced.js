@@ -172,7 +172,22 @@ app.get('/Account/v1/Mb/UserData', (req, res) => {
 // Device data update (called during startup)
 app.post('/UserDevice/v1/MobileDevice/UpdateUserData', (req, res) => {
     console.log('📱 Device UserData update request');
-    res.json(xgResponse(null));
+    res.json(xgResponse({}));
+});
+
+// Added missing analytics endpoint (Called during startup via SendInstallLogUseCase)
+app.post('/BetAffilateIntegration/Device/install/mobile', (req, res) => {
+    console.log('📊 Received install log');
+    res.status(200).send('OK');
+});
+
+// Added missing account endpoint
+app.get('/api/v1/user/account', (req, res) => {
+    res.json(xgResponse({
+        "Id": 123456789,
+        "Balance": 5000.0,
+        "Currency": "USD"
+    }));
 });
 
 app.get('/api/v1/user/profile', (req, res) => {
@@ -403,24 +418,26 @@ app.get('/api/v1/config', (req, res) => {
         const protocol = req.headers['x-forwarded-proto'] || 'http';
         configData.Common.SiteDomain = `${protocol}://${requestHost}`;
 
+        // Critical flags identified from jf/d.smali
+        const criticalFields = {
+            hasSectionToto: true,
+            hasBetConstructor: true,
+            hasFinancial: true,
+            hasSectionXGames: true,
+            hasSectionAggregator: true
+        };
+
         // Construct the full response expected by gf/f.smali (jf/c mapping)
         // and hf/h.smali (jf/d mapping for critical config)
         const response = {
             "Success": true,
             "Result": {
-                "Settings": configData.Settings,
-                "Common": configData.Common,
-                "Bets": configData.Bets,
-                "MainMenu": configData.MainMenu,
-                // Critical flags identified from jf/d.smali
-                "CriticalConfig": {
-                    "hasSectionToto": true,
-                    "hasBetConstructor": true,
-                    "hasFinancial": true,
-                    "hasSectionXGames": true,
-                    "hasSectionAggregator": true
-                }
-            }
+                ...configData,
+                "CriticalConfig": criticalFields
+            },
+            // Redundant top-level fields for strict deserializers
+            ...configData,
+            ...criticalFields
         };
 
         res.json(response);
