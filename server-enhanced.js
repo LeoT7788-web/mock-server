@@ -190,6 +190,18 @@ app.get('/api/v1/user/account', (req, res) => {
     }));
 });
 
+// Added /status.json for domain resolution discovery
+app.get('/status.json', (req, res) => {
+    console.log('🔍 Status.json requested');
+    res.json({
+        "Success": true,
+        "Result": {
+            "Domain": "mock-server-viwh.onrender.com",
+            "ApiEndpoint": "https://mock-server-viwh.onrender.com"
+        }
+    });
+});
+
 app.get('/api/v1/user/profile', (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
     const user = token ? getUser(token) : users.users[0];
