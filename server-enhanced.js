@@ -382,7 +382,20 @@ app.get('/android/versions', (req, res) => {
 
 app.get('/api/v1/config', (req, res) => {
     try {
-        const configPath = path.join(__dirname, '..', 'assets', 'localConfig.json');
+        // Try multiple paths for localConfig.json to support both local and cloud deployments
+        const paths = [
+            path.join(__dirname, 'localConfig.json'),
+            path.join(__dirname, '..', 'assets', 'localConfig.json'),
+            path.join(__dirname, 'assets', 'localConfig.json')
+        ];
+
+        let configPath = paths.find(p => fs.existsSync(p));
+
+        if (!configPath) {
+            console.error('❌ localConfig.json not found in any expected location');
+            return res.status(500).json(errorResponse("Configuration file missing"));
+        }
+
         const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
         // Dynamically determine the host IP from the request
