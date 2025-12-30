@@ -131,6 +131,45 @@ app.get('/UserAuth/Auth', handleLogin);
 app.get('/UserAuth/Auth2', handleLogin);
 app.post('/api/v1/auth/login', handleLogin);
 
+// ========================================
+// Registration APIs
+// ========================================
+
+const handleRegistration = (req, res) => {
+    console.log('📝 Registration request received');
+    const newUser = {
+        "id": Math.floor(Math.random() * 1000000000),
+        "username": "User_" + Math.floor(Math.random() * 10000),
+        "token": "mock_token_" + Date.now(),
+        "balance": 5000.0,
+        "currency": "EGP",
+        "email": "mock@user.com",
+        "firstName": "New",
+        "lastName": "User",
+        "phone": "+20123456789",
+        "country": "Egypt",
+        "verified": true
+    };
+
+    users.users.push(newUser);
+    saveUsers();
+
+    res.json(xgResponse({
+        "Id": newUser.id,
+        "Token": newUser.token,
+        "Balance": newUser.balance,
+        "Currency": newUser.currency,
+        "Message": "Registration Successful - Mock Server"
+    }));
+};
+
+app.post('/api/v1/registration/oneclick', handleRegistration);
+app.post('/api/v1/registration/full', handleRegistration);
+app.post('/api/v1/registration/phone', handleRegistration);
+app.post('/Registration/OneClick', handleRegistration);
+app.post('/Registration/Full', handleRegistration);
+app.post('/Registration/Quick', handleRegistration);
+
 app.post('/api/Profile/GetProfile', (req, res) => {
     const user = users.users[0];
     res.json(xgResponse({
@@ -157,7 +196,7 @@ app.get('/Account/v1/Mb/UserData', (req, res) => {
     const profileData = {
         "Id": user.id,
         "Login": user.id.toString(),
-        "Money": user.balance,
+        "Money": user.balance || 5000.0,
         "Currency": user.currency,
         "ActivateStatus": 1,
         "HasBets": true,
