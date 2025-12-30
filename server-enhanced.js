@@ -131,8 +131,21 @@ app.get('/UserAuth/Auth', handleLogin);
 app.get('/UserAuth/Auth2', handleLogin);
 app.post('/api/v1/auth/login', handleLogin);
 
+app.post('/api/Profile/GetProfile', (req, res) => {
+    const user = users.users[0];
+    res.json(xgResponse({
+        Id: user.id,
+        UserName: user.username,
+        Balance: 5000.75,
+        Currency: "EGP",
+        Email: user.email,
+        Phone: "+20123456789",
+        IsVerified: true
+    }, true));
+});
+
 // ========================================
-// User Profile APIs
+// Users & Wallets
 // ========================================
 
 // Critical endpoint identified for startup: Account/v1/Mb/UserData
@@ -436,7 +449,14 @@ app.get('/api/v1/config', (req, res) => {
             hasBetConstructor: true,
             hasFinancial: true,
             hasSectionXGames: true,
-            hasSectionAggregator: true
+            hasSectionAggregator: true,
+            hasSectionCasino: true,
+            hasSectionSlots: true,
+            hasSectionGames: true,
+            hasPromotions: true,
+            hasOneClickRegistration: true,
+            showMainScreen: true,
+            isTestMode: true
         };
 
         // Construct the full response expected by gf/f.smali (jf/c mapping)
@@ -492,6 +512,41 @@ app.get('/', (req, res) => {
         },
         "totalAPIs": 15
     });
+});
+
+// ========================================
+// Slot / Game List APIs
+// ========================================
+
+app.post('/api/Slot/GetFavoriteGames', (req, res) => {
+    res.json(xgResponse([], true));
+});
+
+app.post('/api/Slot/GetCategories', (req, res) => {
+    res.json(xgResponse([
+        { Id: 1, Name: "Slots" },
+        { Id: 2, Name: "Table Games" },
+        { Id: 3, Name: "New" }
+    ], true));
+});
+
+app.post('/api/Slot/GetProviders', (req, res) => {
+    res.json(xgResponse([
+        { Id: 1, Name: "Melbet Games" }
+    ], true));
+});
+
+app.post('/api/Slot/GetAggregatorNew', (req, res) => {
+    res.json(xgResponse({
+        Total: games.games.length,
+        List: games.games
+    }, true));
+});
+
+app.post('/api/Slot/GetAggregatorProviders', (req, res) => {
+    res.json(xgResponse([
+        { Id: 1, Name: "Melbet Games" }
+    ], true));
 });
 
 // ========================================
